@@ -24,7 +24,25 @@
     width:980px; max-width:95vw; background:var(--card); border-radius:18px; padding:24px; box-shadow:0 20px 40px rgba(0,0,0,0.12);
     position:relative; overflow:hidden;
   }
-  nav { display:flex; gap:12px; margin-bottom:18px; }
+ nav {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+
+/* Mobile fix */
+@media (max-width: 640px) {
+  nav {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  nav::-webkit-scrollbar {
+    display: none;
+  }
+}
   .tab-btn {
     padding:8px 14px; border-radius:999px; border:none; background:#fff; cursor:pointer; font-weight:600;
     box-shadow:0 6px 18px rgba(0,0,0,0.06);
@@ -131,6 +149,13 @@
     flex-direction:column;
     height:auto;
     gap:12px;
+  }
+
+  #noBtn{
+    position:relative;
+    left:0;
+    top:0;
+    transform:none !important;
   }
 
   button.action{
@@ -320,24 +345,16 @@
 });
 
     // No button that moves away on hover or click
-   function moveNo() {
-  const container = document.querySelector('.btns');
-  const containerRect = container.getBoundingClientRect();
-
-  const maxX = containerRect.width - noBtn.offsetWidth;
-  const maxY = containerRect.height - noBtn.offsetHeight;
-
-  const x = Math.random() * maxX;
-  const y = Math.random() * maxY;
-
-  noBtn.style.position = "absolute";
-  noBtn.style.left = x + "px";
-  noBtn.style.top = y + "px";
-}
-
-    noBtn.addEventListener('mouseenter', moveNo); // desktop
-noBtn.addEventListener('click', moveNo);      // mobile tap
-noBtn.addEventListener('touchstart', moveNo); // better mobile support
+    function moveNo() {
+      const containerRect = document.querySelector('.site').getBoundingClientRect();
+      const maxX = containerRect.width - noBtn.offsetWidth - 40;
+      const maxY = 120; // keep roughly in the hero area
+      const x = Math.random()*maxX;
+      const y = Math.random()*maxY;
+      noBtn.style.transform = `translate(${x}px, ${y}px)`;
+    }
+    noBtn.addEventListener('mouseenter', moveNo);
+    noBtn.addEventListener('click', moveNo);
 
     // Play/pause control
     playToggle.addEventListener('click', ()=> {
@@ -424,4 +441,3 @@ noBtn.addEventListener('touchstart', moveNo); // better mobile support
   </script>
 </body>
 </html>
-
