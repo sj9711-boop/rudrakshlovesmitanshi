@@ -1,0 +1,426 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Mitanshi, Will you be my Valentine?</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg1: #ff9a9e;
+    --bg2: #fad0c4;
+    --card: rgba(255,255,255,0.95);
+    --accent: #e83e6b;
+    --muted: #6b6b6b;
+  }
+  *{box-sizing:border-box;font-family:'Poppins',sans-serif}
+  body{
+    margin:0; min-height:100vh; background:linear-gradient(135deg,var(--bg1),var(--bg2));
+    display:flex; align-items:flex-start; justify-content:center; padding:28px;
+  }
+
+  /* Layout */
+  .site {
+    width:980px; max-width:95vw; background:var(--card); border-radius:18px; padding:24px; box-shadow:0 20px 40px rgba(0,0,0,0.12);
+    position:relative; overflow:hidden;
+  }
+  nav { display:flex; gap:12px; margin-bottom:18px; }
+  .tab-btn {
+    padding:8px 14px; border-radius:999px; border:none; background:#fff; cursor:pointer; font-weight:600;
+    box-shadow:0 6px 18px rgba(0,0,0,0.06);
+  }
+  .tab-btn.active { background:linear-gradient(90deg,var(--accent),#ff6b9a); color:#fff; }
+
+  /* Main hero */
+  .hero { display:flex; gap:24px; align-items:center; }
+  .hero-left { flex:1; padding:20px; }
+ .hero h1 { 
+  margin:0; 
+  color:var(--accent); 
+  font-size:clamp(22px, 5vw, 34px); 
+}
+  .hero p { color:var(--muted); margin:10px 0 22px; }
+
+  .btns { display:flex; gap:14px; align-items:center; position:relative; height:60px; }
+  button.action {
+    padding:12px 22px; border-radius:34px; border:none; cursor:pointer; font-weight:700; font-size:16px;
+    box-shadow: 0 10px 18px rgba(0,0,0,0.08);
+  }
+  #yesBtn { background: linear-gradient(90deg,#ff6b9a,#ff4d6d); color:white; }
+  #noBtn { background:#c7d2d8; color:#222; position:absolute; left:150px; top:0; }
+
+  /* final message area */
+  .finalMessage { display:none; margin-top:18px; padding:18px; border-radius:12px; background:rgba(232,62,107,0.06); color:var(--accent); font-weight:600; }
+
+  /* Floating hearts (background) */
+  .heart {
+    position:absolute; width:18px; height:18px; background:#ff4d6d; transform:rotate(45deg); opacity:0.6;
+    top:0; left:0; pointer-events:none;
+  }
+  .heart:before,.heart:after{ content:''; position:absolute; width:18px; height:18px; background:#ff4d6d; border-radius:50%;}
+  .heart:before{ top:-9px; left:0 } .heart:after{ left:-9px; top:0 }
+  @keyframes floaty { from { transform: translateY(110vh) rotate(45deg);} to{ transform: translateY(-20vh) rotate(45deg);} }
+
+  /* Tabs content */
+  .content { margin-top:18px; min-height:260px; }
+  .section { display:none; }
+  .section.active { display:block; }
+
+  /* Cats animation (safe & cute) */
+  .cats {
+    display:flex; gap:20px; align-items:flex-end; justify-content:center; padding:18px;
+  }
+  .cat {
+    width:150px; height:150px; border-radius:18px; position:relative; background:#fff; display:flex; align-items:center; justify-content:center;
+    box-shadow:0 12px 30px rgba(0,0,0,0.08);
+    overflow:visible;
+  }
+  /* We'll use simple emoji-based cats for simplicity (replace with SVGs/GIFs if you prefer) */
+  .cat .face { font-size:70px; transform-origin:center bottom; transition:transform .35s ease; }
+  .cat.cuddle-left { animation: nudge-left 2s ease-in-out infinite; }
+  .cat.cuddle-right { animation: nudge-right 2s ease-in-out infinite; }
+
+  @keyframes nudge-left { 0%,100%{transform: translateX(0)} 50%{transform: translateX(6px)} }
+  @keyframes nudge-right{ 0%,100%{transform: translateX(0)} 50%{transform: translateX(-6px)} }
+
+  .hearts-above { position:absolute; top:-12px; left:50%; transform:translateX(-50%); display:flex; gap:8px; }
+  .small-heart { width:22px; height:22px; background:#ff6b9a; transform:rotate(45deg); border-radius:4px; opacity:0; animation: popheart 1.8s ease-in-out infinite; }
+  .small-heart:nth-child(1){ animation-delay:0s } .small-heart:nth-child(2){ animation-delay:0.4s } .small-heart:nth-child(3){ animation-delay:0.8s }
+  @keyframes popheart {
+    0%{ transform:translateY(8px) rotate(45deg); opacity:0 }
+    30%{ transform:translateY(-6px) rotate(45deg) scale(1.06); opacity:1 }
+    100%{ transform:translateY(-26px) rotate(45deg) scale(.9); opacity:0 }
+  }
+
+  /* Envelopes */
+  .envelopes { display:flex; gap:18px; justify-content:center; padding:20px; flex-wrap:wrap; }
+  .envelope { width:150px; height:100px; background:linear-gradient(180deg,#fff,#f7f7f7); border-radius:6px; position:relative; cursor:pointer; box-shadow:0 10px 18px rgba(0,0,0,0.06); display:flex; align-items:center; justify-content:center; }
+  .envelope .flap { position:absolute; top:-20px; left:0; right:0; height:60px; transform-origin:center top; background:linear-gradient(90deg,#ff6b9a,#ff9aa8); clip-path:polygon(0 100%,50% 0,100% 100%); transition: transform .4s ease; }
+  .envelope.open .flap { transform: translateY(12px) rotateX(180deg); }
+  .letter { opacity:0; transform: translateY(10px); transition:all .4s ease; padding:12px; font-size:14px; color:#333 }
+  .envelope.open .letter { opacity:1; transform: translateY(0); }
+
+  /* small responsive */
+  @media (max-width:640px){ .hero{flex-direction:column; align-items:stretch} .cat{width:120px;height:120px} }
+@media (max-width:640px){
+
+  body{
+    padding:12px;
+  }
+
+  .site{
+    padding:16px;
+    border-radius:14px;
+  }
+
+  .hero{
+    flex-direction:column;
+    align-items:stretch;
+  }
+
+  .hero h1{
+    font-size:24px;
+    line-height:1.3;
+  }
+
+  .hero p{
+    font-size:14px;
+  }
+
+  .btns{
+    flex-direction:column;
+    height:auto;
+    gap:12px;
+  }
+
+  button.action{
+    width:100%;
+  }
+
+  .envelope{
+    width:100%;
+    max-width:260px;
+  }
+
+  .letter{
+    font-size:13px;
+    word-wrap:break-word;
+    white-space:normal;
+  }
+
+  nav{
+    font-size:14px;
+  }
+
+}
+</style>
+</head>
+<body>
+  <div class="site" role="main" aria-label="Valentine page">
+    <nav>
+      <button class="tab-btn active" data-tab="home">Home</button>
+      <button class="tab-btn" data-tab="ps">Mitanshi & Rudraksh</button>
+      <button class="tab-btn" data-tab="letters">Letters</button>
+      <button class="tab-btn" data-tab="playlist">Playlist</button>
+      <button class="tab-btn" data-tab="love">I Love You</button>
+    </nav>
+
+    <div class="content">
+      <!-- HOME -->
+      <section id="home" class="section active">
+        <div class="hero">
+          <div class="hero-left">
+            <h1>Will you be my Valentine? 💘</h1>
+            <p>One tiny question. One big heart. Pick one — but beware, the <strong>No</strong> button plays hide & seek 😉</p>
+            <div class="btns" id="btnRow">
+              <button id="yesBtn" class="action">Yes 💖</button>
+              <button id="noBtn" class="action">No 🙈</button>
+            </div>
+
+            <div id="finalMsg" class="finalMessage" aria-live="polite"></div>
+          </div>
+
+          <div style="flex:0 0 320px">
+            <div style="padding:12px; border-radius:12px; background:linear-gradient(180deg,#fff,#fff5f7); box-shadow:0 8px 20px rgba(0,0,0,0.05);">
+             
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+     <!-- Mitanshi & Rudraksh TAB -->
+     <section id="ps" class="section">
+     <h2 style="text-align:center;color:var(--accent);margin-bottom:16px;">
+      Mitanshi & Rudraksh 💞
+      </h2>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;">
+
+      <div style="text-align:center;">
+        <img src="gif1.gif" style="width:100%;border-radius:14px;">
+        <p>We cuddle ✨</p>
+        </div>
+
+      <div style="text-align:center;">
+        <img src="gif2.gif" style="width:100%;border-radius:14px;">
+        <p>We do dirty things 💖</p>
+        </div>
+ 
+      <div style="text-align:center;">
+        <img src="gif3.gif" style="width:100%;border-radius:14px;">
+        <p>We fight </p>
+        </div>
+
+      <div style="text-align:center;">
+        <img src="gif4.gif" style="width:100%;border-radius:14px;">
+        <p>You feel like home 🏡</p>
+        </div>
+
+    </div>
+  </section>
+
+      <!-- LETTERS -->
+      <section id="letters" class="section">
+        <h3 style="text-align:center;color:var(--accent)">Letters — tap to open</h3>
+        <div class="envelopes" id="envelopeRow" role="list">
+          <div class="envelope" data-index="0" role="listitem" aria-label="Letter 1">
+            <div class="flap"></div>
+            <div class="letter"></div>
+          </div>
+          <div class="envelope" data-index="1" role="listitem" aria-label="Letter 2">
+            <div class="flap"></div>
+            <div class="letter"></div>
+          </div>
+          <div class="envelope" data-index="2" role="listitem" aria-label="Letter 3">
+            <div class="flap"></div>
+            <div class="letter"></div>
+          </div>
+        </div>
+        <p style="text-align:center;color:var(--muted)">Each envelope can reveal a short personal note.</p>
+      </section>
+
+      <!-- PLAYLIST -->
+      <section id="playlist" class="section">
+        <h3 style="text-align:center;color:var(--accent)">Playlist</h3>
+        <p style="text-align:center;color:var(--muted)">The romantic tune will start when she clicks <strong>Yes</strong>. You can also press play here:</p>
+        <div style="text-align:center; margin-top:12px">
+         <audio id="bgm" loop controls>
+           <source src="song.mpeg" type="audio/mpeg">
+         </audio>
+          <button id="playToggle" class="tab-btn" aria-pressed="false">Play / Pause</button>
+        </div>
+      </section>
+
+      <!-- I LOVE YOU TAB -->
+  <section id="love" class="section">
+    <h2 style="text-align:center;color:var(--accent);margin-bottom:18px;">
+      I Love You ❤️
+    </h2>
+
+    <div style="max-width:420px;margin:0 auto;text-align:center;">
+      <img src="our-photo.jpeg" style="width:100%;border-radius:18px;">
+
+      <p style="margin-top:18px;font-size:18px;font-weight:600;color:var(--accent);">
+        I choose you in every moment,Mitanshi
+      </p>
+    </div>
+  </section>
+
+</div>
+
+    </div>
+  </div>
+
+  <!-- Floating hearts (background, created dynamically) -->
+  <script>
+    /* ---------- Interaction: tabs ---------- */
+    document.querySelectorAll('.tab-btn').forEach(btn=>{
+      btn.addEventListener('click', ()=> {
+        document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        const tab = btn.dataset.tab;
+        document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+        document.getElementById(tab).classList.add('active');
+      });
+    });
+
+    /* ---------- Yes / No behavior & music ---------- */
+    const yesBtn = document.getElementById('yesBtn');
+    const noBtn = document.getElementById('noBtn');
+    const finalMsg = document.getElementById('finalMsg');
+    const audio = document.getElementById('bgm');
+    yesBtn.addEventListener("click", () => {
+    audio.play();
+    });
+    const playToggle = document.getElementById('playToggle');
+
+    // Replaceable messages (pick any)
+    const finalMessageVariants = [
+      "I knew you’d say YES. Let’s have a virtual date tonight. 💻🕯️"
+    ];
+
+    yesBtn.addEventListener("click", () => {
+  finalMsg.style.display = "block";
+  finalMsg.textContent = finalMessageVariants[0];
+
+  audio.currentTime = 0;
+  audio.muted = false;
+  audio.play()
+    .then(() => {
+      playToggle.textContent = "Pause";
+      playToggle.setAttribute("aria-pressed", "true");
+    })
+    .catch(err => {
+      alert("Tap Play in Playlist tab to start music 🎶");
+      console.log(err);
+    });
+
+  burstHearts();
+});
+
+    // No button that moves away on hover or click
+   function moveNo() {
+  const container = document.querySelector('.btns');
+  const containerRect = container.getBoundingClientRect();
+
+  const maxX = containerRect.width - noBtn.offsetWidth;
+  const maxY = containerRect.height - noBtn.offsetHeight;
+
+  const x = Math.random() * maxX;
+  const y = Math.random() * maxY;
+
+  noBtn.style.position = "absolute";
+  noBtn.style.left = x + "px";
+  noBtn.style.top = y + "px";
+}
+
+    noBtn.addEventListener('mouseenter', moveNo); // desktop
+noBtn.addEventListener('click', moveNo);      // mobile tap
+noBtn.addEventListener('touchstart', moveNo); // better mobile support
+
+    // Play/pause control
+    playToggle.addEventListener('click', ()=> {
+      if (audio.paused) { audio.play(); playToggle.textContent='Pause'; playToggle.setAttribute('aria-pressed','true'); }
+      else { audio.pause(); playToggle.textContent='Play / Pause'; playToggle.setAttribute('aria-pressed','false'); }
+    });
+
+    /* ---------- Floating hearts background ---------- */
+    for (let i=0;i<18;i++){
+      const h = document.createElement('div');
+      h.className='heart';
+      h.style.left = Math.random()*100 + 'vw';
+      h.style.animationDuration = (6 + Math.random()*6) + 's';
+      h.style.top = (Math.random()*20 + 60) + 'vh';
+      h.style.opacity = 0.2 + Math.random()*0.7;
+      h.style.transform = 'rotate(45deg)';
+      h.style.zIndex = 0;
+      h.style.pointerEvents='none';
+      h.style.animationName='floaty';
+      document.body.appendChild(h);
+    }
+
+    /* ---------- Letters: envelopes open & typewriter ---------- */
+    const envelopeRow = document.getElementById('envelopeRow');
+    const letterTexts = [
+      "Letter 1: Hey beautiful — I keep replaying the moment I first saw you. This is my favorite chapter.",
+      "Letter 2: Little promises: a shoulder when you're tired, jokes when you're sad, flowers on random Tuesdays.",
+      "Letter 3: Mitanshi,This one is simple and true — I choose you. Today, tomorrow, in all the small ways."
+    ];
+
+    envelopeRow.querySelectorAll('.envelope').forEach((env)=>{
+      env.querySelector('.letter').textContent = ''; // start empty
+      env.addEventListener('click', async ()=>{
+        if (!env.classList.contains('open')) {
+          // open flap
+          env.classList.add('open');
+          // typewriter effect
+          const i = Number(env.dataset.index) || 0;
+          const txt = letterTexts[i] || "A little note for you.";
+          const letterDiv = env.querySelector('.letter');
+          letterDiv.textContent = ''; // clear
+          await typeWriter(letterDiv, txt, 20);
+        } else {
+          // close
+          env.classList.remove('open');
+        }
+      });
+    });
+
+    // small async typewriter
+    function typeWriter(el, text, speed=30) {
+      return new Promise(resolve=>{
+        let i=0;
+        const iv = setInterval(()=>{
+          el.textContent += text.charAt(i);
+          i++;
+          if (i>=text.length) { clearInterval(iv); resolve(); }
+        }, speed);
+      });
+    }
+
+    /* ---------- Cat hearts burst ---------- */
+    function burstHearts(){
+      const centerX = window.innerWidth/2;
+      for (let i=0;i<9;i++){
+        const s = document.createElement('div');
+        s.className='small-heart';
+        s.style.position='fixed';
+        s.style.left = (centerX + (Math.random()*200-100)) + 'px';
+        s.style.top = (150 + (Math.random()*120-60)) + 'px';
+        s.style.zIndex = 999;
+        document.body.appendChild(s);
+        setTimeout(()=> s.remove(), 2200);
+      }
+    }
+
+    /* ---------- Accessibility: keyboard open envelopes ---------- */
+    envelopeRow.querySelectorAll('.envelope').forEach(e=>{
+      e.tabIndex = 0;
+      e.addEventListener('keydown', ev => { if(ev.key==='Enter'||ev.key===' ') e.click(); });
+    });
+
+    /* ---------- END ---------- */
+  </script>
+</body>
+</html>
